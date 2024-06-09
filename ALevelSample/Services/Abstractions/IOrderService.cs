@@ -9,4 +9,6 @@ public interface IOrderService
     Task<int> AddOrderAsync(string user, List<OrderItem> items);
     Task<Order> GetOrderAsync(int id);
     Task<IReadOnlyList<Order>> GetOrderByUserIdAsync(string id);
+    Task<int> UpdateOrderAsync(int id, string user, List<OrderItem> items);
+    Task DeleteOrderAsync(int id);
 }

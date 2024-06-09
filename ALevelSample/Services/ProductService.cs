@@ -1,9 +1,13 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using ALevelSample.Data;
+using ALevelSample.Data.Entities;
 using ALevelSample.Models;
+using ALevelSample.Repositories;
 using ALevelSample.Repositories.Abstractions;
 using ALevelSample.Services.Abstractions;
 using Microsoft.Extensions.Logging;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace ALevelSample.Services;
 
@@ -28,6 +32,24 @@ public class ProductService : BaseDataService<ApplicationDbContext>, IProductSer
         var id = await _productRepository.AddProductAsync(name, price);
         _loggerService.LogInformation($"Created product with Id = {id}");
         return id;
+    }
+
+    public async Task<int> UpdateProductAsync(int id, string name, double price)
+    {
+        var updatedId = await _productRepository.UpdateProductAsync(id, name, price);
+        _loggerService.LogInformation($"Updated product with Id = {id}");
+        return id;
+    }
+
+    public async Task DeleteProductAsync(int id)
+    {
+        await _productRepository.DeleteProductAsync(id);
+        _loggerService.LogInformation($"Deleted product with Id = {id}");
+    }
+
+    public async Task<List<ProductEntity>> GetProductsAsync(int page, string? filterByName, double? filterByPrice)
+    {
+        return await _productRepository.GetProductsAsync(page, filterByName, filterByPrice);
     }
 
     public async Task<Product> GetProductAsync(int id)

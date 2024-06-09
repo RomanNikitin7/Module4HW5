@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using ALevelSample.Data;
 using ALevelSample.Data.Entities;
+using ALevelSample.Models;
 using ALevelSample.Repositories.Abstractions;
 using ALevelSample.Services.Abstractions;
 using Microsoft.EntityFrameworkCore;
@@ -36,5 +37,36 @@ public class UserRepository : IUserRepository
     public async Task<UserEntity?> GetUserAsync(string id)
     {
         return await _dbContext.Users.FirstOrDefaultAsync(f => f.Id == id);
+    }
+
+    public async Task<string> UpdateUserAsync(string id, string firstName, string lastName)
+    {
+        var user = await _dbContext.Users.FindAsync(id);
+
+        if (user == null)
+        {
+            throw new Exception("User not found");
+        }
+
+        user.FirstName = firstName;
+        user.LastName = lastName;
+
+        await _dbContext.SaveChangesAsync();
+
+        return user.Id;
+    }
+
+    public async Task DeleteUserAsync(string id)
+    {
+        var user = await _dbContext.Users.FindAsync(id);
+
+        if (user == null)
+        {
+            throw new Exception("User not found");
+        }
+
+        _dbContext.Users.Remove(user);
+
+        await _dbContext.SaveChangesAsync();
     }
 }

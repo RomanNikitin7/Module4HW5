@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -37,6 +38,47 @@ public class OrderRepository : IOrderRepository
         await _dbContext.SaveChangesAsync();
 
         return result.Entity.Id;
+    }
+
+    public async Task<int> UpdateOrderAsync(int id, string user, List<OrderItem> items)
+    {
+        var order = await _dbContext.Orders.FindAsync(id);
+
+        if (order == null)
+        {
+            throw new Exception("Order not found");
+        }
+
+        order.UserId = user;
+
+        _dbContext.OrderItems.RemoveRange(order.OrderItems);
+
+        await _dbContext.OrderItems.AddRangeAsync(items.Select(s => new OrderItemEntity()
+        {
+            Count = s.Count,
+            OrderId = order.Id,
+            ProductId = s.ProductId
+        }));
+
+        await _dbContext.SaveChangesAsync();
+
+        return order.Id;
+    }
+
+    public async Task DeleteOrderAsync(int id)
+    {
+        var order = await _dbContext.Orders.FindAsync(id);
+
+        if (order == null)
+        {
+            throw new Exception("Order not found");
+        }
+
+        _dbContext.OrderItems.RemoveRange(order.OrderItems);
+
+        _dbContext.Orders.Remove(order);
+
+        await _dbContext.SaveChangesAsync();
     }
 
     public async Task<OrderEntity?> GetOrderAsync(int id)

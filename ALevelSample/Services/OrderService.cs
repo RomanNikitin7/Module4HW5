@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ALevelSample.Data;
 using ALevelSample.Models;
+using ALevelSample.Repositories;
 using ALevelSample.Repositories.Abstractions;
 using ALevelSample.Services.Abstractions;
 using Microsoft.Extensions.Logging;
@@ -30,6 +31,19 @@ public class OrderService : BaseDataService<ApplicationDbContext>, IOrderService
         var id = await _orderRepository.AddOrderAsync(user, items);
         _loggerService.LogInformation($"Created order with Id = {id}");
         return id;
+    }
+
+    public async Task<int> UpdateOrderAsync(int id, string user, List<OrderItem> items)
+    {
+        var updatedId = await _orderRepository.UpdateOrderAsync(id, user, items);
+        _loggerService.LogInformation($"Updated order with Id = {id}");
+        return updatedId;
+    }
+
+    public async Task DeleteOrderAsync(int id)
+    {
+        await _orderRepository.DeleteOrderAsync(id);
+        _loggerService.LogInformation($"Deleted order with Id = {id}");
     }
 
     public async Task<Order> GetOrderAsync(int id)
